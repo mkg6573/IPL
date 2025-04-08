@@ -9,7 +9,13 @@ ipl = pd.read_csv("matches.csv",parse_dates=['date'])
 ball_df = pd.read_csv("ball_by_ball.csv")
 six_df = pd.read_csv("six_data.csv")
 four_df = pd.read_csv("four.csv")
-merge_df = pd.read_csv("merge_data.csv")
+merge_df = pd.read_csv("merge_data.csv",low_memory=False)
+
+#replace
+ipl.replace('Royal Challengers Bangalore','Royal Challengers Bengaluru',inplace=True)
+ipl.replace('Delhi Daredevils','Delhi Capitals',inplace=True)
+ipl.replace('Kings XI Punjab','Punjab Kings',inplace=True)
+ipl.replace('Deccan Chargers','Sunrisers Hyderabad',inplace=True)
 
 # final matches data set hai temp_df
 temp_df = ipl[ipl['match_type'] == 'Final']
@@ -90,7 +96,10 @@ def avg(ball_df,batter,merge_df):
     for i in year:
         run = temp_df[temp_df['season'] == i]['batsman_runs'].sum()
         out = temp_df[temp_df['season'] == i]['is_wicket'].sum()
-        avgerage = np.round(run/out,decimals=3)
+        if out == 0 :
+            avgerage = None
+        else:
+            avgerage = np.round(run/out,decimals=3)
         l.append(avgerage)
     data = {
         'season':year,
@@ -113,7 +122,10 @@ def Strike_rate(ball_df,batter,merge_df):
     for i in year:
         run = temp_df[temp_df['season'] == i]['batsman_runs'].sum()
         ball = temp_df[temp_df['season'] == i]['batter'].count()
-        sr = np.round(run/ball,decimals=3)*100
+        if ball == 0:
+            sr = None
+        else:
+            sr = np.round(run/ball,decimals=3)*100
         l.append(sr)
     data = {
         'season':year,
