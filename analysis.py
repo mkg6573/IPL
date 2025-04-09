@@ -11,11 +11,14 @@ six_df = pd.read_csv("six_data.csv")
 four_df = pd.read_csv("four.csv")
 merge_df = pd.read_csv("merge_data.csv",low_memory=False)
 
-#replace
+#replace in ball_df data
+ball_df.replace('RG Sharma','R Sharma',inplace=True)
+#replace in ipl data
 ipl.replace('Royal Challengers Bangalore','Royal Challengers Bengaluru',inplace=True)
 ipl.replace('Delhi Daredevils','Delhi Capitals',inplace=True)
 ipl.replace('Kings XI Punjab','Punjab Kings',inplace=True)
 ipl.replace('Deccan Chargers','Sunrisers Hyderabad',inplace=True)
+ipl.replace('RG Sharma','R Sharma',inplace=True)
 
 # final matches data set hai temp_df
 temp_df = ipl[ipl['match_type'] == 'Final']
@@ -87,7 +90,7 @@ def avg(ball_df,batter,merge_df):
     strick_rate = np.round(total_run/total_out,decimals=3)
     st.subheader(f"Total run by {batter} is : {total_run}")
     st.subheader(f"Total dismissal : {total_out}")
-    st.subheader(f"Strike Rate : {strick_rate}")
+    st.subheader(f"Batter Avg : {strick_rate}")
     #graph
     st.text(f"Graph of SR vs Season {batter}")
     year = ['2007/08','2009','2009/10','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020/21','2021','2022','2023','2024']
