@@ -30,7 +30,7 @@ def final_overall_winner(ipl):
     
 def season_winner(temp_df,final_option):
     st.subheader(f"Season {final_option} Winner ")
-    st.dataframe(temp_df[temp_df['season']==final_option])
+    st.dataframe(temp_df[temp_df['season']==final_option],hide_index=True)
 
 def total_number_matches(ipl,ball_df):
     a = ipl.shape[0]
@@ -59,7 +59,7 @@ def no_of_six_of_batter(ball_df,batter,six_df):
     data = pd.DataFrame(data)
     graph = px.bar(data,x='season',y='Total Six')
     st.plotly_chart(graph)
-    st.dataframe(data)
+    st.dataframe(data,hide_index=True)
 
 def no_of_four_of_batter(batter,four_df):
     four = four_df[four_df['batter'] == batter]['batter'].count()
@@ -79,7 +79,7 @@ def no_of_four_of_batter(batter,four_df):
     data = pd.DataFrame(data)
     graph = px.bar(data,x='season',y='Total Four')
     st.plotly_chart(graph)
-    st.dataframe(data)
+    st.dataframe(data,hide_index=True)
     
 def avg(ball_df,batter,merge_df):
     total_run = ball_df[ball_df['batter'] == batter]['batsman_runs'].sum()
@@ -108,7 +108,7 @@ def avg(ball_df,batter,merge_df):
     data = pd.DataFrame(data)
     graph = px.line(data,x='season',y='avg')
     st.plotly_chart(graph)
-    st.dataframe(data)
+    st.dataframe(data,hide_index=True)
 
 def Strike_rate(ball_df,batter,merge_df):
     total_run = ball_df[ball_df['batter'] == batter]['batsman_runs'].sum()
@@ -134,7 +134,7 @@ def Strike_rate(ball_df,batter,merge_df):
     data = pd.DataFrame(data)
     graph = px.line(data,x='season',y='SR')
     st.plotly_chart(graph)
-    st.dataframe(data)
+    st.dataframe(data,hide_index=True)
 
 def win_ratio(ipl,team):
     team_a = ipl['team1'].value_counts()
@@ -154,7 +154,7 @@ def win_ratio(ipl,team):
         'Win Ratio':win_ratio
     }
     data = pd.DataFrame(data)
-    st.dataframe(data)
+    st.dataframe(data,hide_index=True)
 
 def overall_win_loss(ipl,team):
     team_list = ipl['team1'].unique().tolist()
@@ -183,15 +183,42 @@ def overall_win_loss(ipl,team):
         'Win Ratio':ratio_list
     }
     data = pd.DataFrame(data)
-    st.dataframe(data)
+    st.dataframe(data,hide_index=True)
     #graph
     graph = px.bar(data,x ='Name of Team',y='Win Ratio')
     st.text("Win ratio bar graph")
     st.plotly_chart(graph)
 
+def super_over_matches(ipl):
+    st.subheader("Super Over Match")
+    super_over = ipl[ipl['super_over'] == 'Y']
+    sp = super_over.drop(columns=['id','city','date','match_type','player_of_match','venue','toss_decision','result','result_margin','target_overs','super_over','umpire1','umpire2'])
+    st.dataframe(sp,hide_index=True)
+
+def toss_analysis(ipl):
+    toss_data = ipl['toss_winner'].value_counts().reset_index()
+    st.dataframe(toss_data,hide_index=True)
+    #graph
+    st.text("Percantage of teams winning toss")
+    graph = px.pie(toss_data,names='toss_winner',values='count')
+    st.plotly_chart(graph)
+    st.text("Decision of Toss Winning team to bat or field")
+    decision = ipl['toss_decision'].value_counts().reset_index()
+    graph2 = px.pie(decision,names='toss_decision',values='count')
+    st.plotly_chart(graph2)
+
+def player_of_matches(ipl):
+    player_of_match = ipl['player_of_match'].value_counts().reset_index().head(10)
+    st.dataframe(player_of_match,hide_index=True)
+    #graph
+    st.text("Top ten most player of match")
+    graph = px.pie(player_of_match,names='player_of_match',values='count')
+    st.plotly_chart(graph)
+
 
 option = st.sidebar.selectbox('select One',['Final winner','Total matches','No. of six','No. of Four',
-                    'Batter Avg','Strike Rate','Win and Loss'])
+                    'Batter Avg','Strike Rate','Win and Loss','Super Over Match','Toss analysis',
+                    'Most Player of match'])
 
 if option == 'Final winner':
     final_option = st.sidebar.selectbox('select one',['OverAll','2007/08','2009','2009/10','2011','2012','2013','2014','2015','2016',
@@ -244,3 +271,17 @@ elif option == 'Win and Loss':
             overall_win_loss(ipl,team)
         else:
             win_ratio(ipl,team)
+
+elif option == 'Super Over Match':
+    show = st.sidebar.button("Show")
+    if show:
+        super_over_matches(ipl)
+
+elif option == 'Toss analysis':
+    show = st.sidebar.button("Show")
+    if show:
+        toss_analysis(ipl)
+elif option == 'Most Player of match':
+    show = st.sidebar.button("Show")
+    if show:
+        player_of_matches(ipl)
