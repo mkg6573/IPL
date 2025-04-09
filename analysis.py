@@ -136,9 +136,62 @@ def Strike_rate(ball_df,batter,merge_df):
     st.plotly_chart(graph)
     st.dataframe(data)
 
+def win_ratio(ipl,team):
+    team_a = ipl['team1'].value_counts()
+    team_b = ipl['team2'].value_counts()
+    total_match = team_a + team_b
+    t_match = total_match[team]
+    total_win = ipl['winner'].value_counts()
+    loss = total_match[team] - total_win[team]
+    win = total_win[team]
+    win_ratio = np.round(win/loss,decimals=3)
+    st.subheader(f"Win ratio of {team} is {win_ratio}")
+    data = {
+        'Team':[team],
+        'Total match':t_match,
+        'Win':win,
+        'Loss':loss,
+        'Win Ratio':win_ratio
+    }
+    data = pd.DataFrame(data)
+    st.dataframe(data)
+
+def overall_win_loss(ipl,team):
+    team_list = ipl['team1'].unique().tolist()
+    team_a = ipl['team1'].value_counts()
+    team_b = ipl['team2'].value_counts()
+    total_win = ipl['winner'].value_counts()
+    total_match = team_a + team_b
+    match_list = []
+    loss_list = []
+    win_list = []
+    ratio_list = []
+    for i in team_list:
+        t_match = total_match[i]
+        match_list.append(t_match)
+        loss = total_match[i] - total_win[i]
+        loss_list.append(loss)
+        win = total_win[i]
+        win_list.append(win)
+        win_ratio = np.round(win/loss,decimals=3)
+        ratio_list.append(win_ratio)
+    data = {
+        'Name of Team':team_list,
+        'Match':match_list,
+        'Win':win_list,
+        'Loss':loss_list,
+        'Win Ratio':ratio_list
+    }
+    data = pd.DataFrame(data)
+    st.dataframe(data)
+    #graph
+    graph = px.bar(data,x ='Name of Team',y='Win Ratio')
+    st.text("Win ratio bar graph")
+    st.plotly_chart(graph)
+
 
 option = st.sidebar.selectbox('select One',['Final winner','Total matches','No. of six','No. of Four',
-                    'Batter Avg','Strike Rate'])
+                    'Batter Avg','Strike Rate','Win and Loss'])
 
 if option == 'Final winner':
     final_option = st.sidebar.selectbox('select one',['OverAll','2007/08','2009','2009/10','2011','2012','2013','2014','2015','2016',
@@ -180,3 +233,14 @@ elif option == 'Strike Rate':
     show = st.sidebar.button("Show")
     if show:
         Strike_rate(ball_df,batter,merge_df)
+
+elif option == 'Win and Loss':
+    temp = ipl['team1'].unique().tolist()
+    temp.append('Overall')
+    team = st.sidebar.selectbox('Select Team',temp)
+    show = st.sidebar.button("Show")
+    if show:
+        if team == 'Overall':
+            overall_win_loss(ipl,team)
+        else:
+            win_ratio(ipl,team)
