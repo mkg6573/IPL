@@ -218,6 +218,15 @@ def player_of_matches(ipl):
     graph = px.pie(player_of_match,names='player_of_match',values='count')
     st.plotly_chart(graph)
 
+def top_20_bowler(ball_df):
+    top_20 = ball_df[ball_df['is_wicket'] == 1]['bowler'].value_counts().reset_index().head(20)
+    st.dataframe(top_20,hide_index=True)
+    #graph
+    graph = px.bar(top_20,x='bowler',y='count')
+    st.plotly_chart(graph)
+
+def each_bowler_wicket(ball_df,bowler):
+    each_bowler = ball_df[ball_df['is_wicket'] == 1]['bowler'].value_counts()[bowler]
 
 option = st.sidebar.selectbox('select One',['Final winner','Total matches','No. of six','No. of Four',
                     'Batter Avg','Strike Rate','Win and Loss','Super Over Match','Toss analysis',
@@ -290,4 +299,12 @@ elif option == 'Most Player of match':
         player_of_matches(ipl)
 
 elif option == 'Wicket':
-    st.sidebar.selectbox('Select Bowler',ball_df['bowler'].unique().tolist())
+    bowler_list = ball_df['bowler'].unique().tolist()
+    bowler_list.insert(0,'Top 20 Bowler')
+    bowler = st.sidebar.selectbox('Select Bowler',bowler_list)
+    show = st.sidebar.button("Show")
+    if show:
+        if bowler == 'Top 20 Bowler':
+            top_20_bowler(ball_df)
+        else:
+            pass
